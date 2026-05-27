@@ -1,0 +1,190 @@
+export default function BretonniaArmyBuilder() {
+  const units = [
+    {
+      id: 1,
+      name: "Seigneur Bretonnien",
+      category: "Personnage",
+      points: 220,
+      rules: ["Vertu héroïque", "Bénédiction de la Dame", "Commandement 9"],
+      options: [
+        { name: "Hippogriffe", points: 200 },
+        { name: "Bouclier enchanté", points: 15 },
+        { name: "Lance de cavalerie", points: 10 }
+      ],
+      profile: { M:4, CC:6, CT:3, F:4, E:4, PV:3, I:5, A:4, Cd:9 }
+    },
+    {
+      id: 2,
+      name: "Chevaliers du Royaume",
+      category: "Base",
+      points: 120,
+      rules: ["Fer de Lance", "Bénédiction de la Dame", "Cavalerie lourde"],
+      options: [
+        { name: "État-major complet", points: 30 },
+        { name: "Bannière magique", points: 25 }
+      ],
+      profile: { M:4, CC:4, CT:3, F:3, E:3, PV:1, I:3, A:1, Cd:8 }
+    },
+    {
+      id: 3,
+      name: "Archers Paysans",
+      category: "Base",
+      points: 70,
+      rules: ["Tirailleurs", "Pieux défensifs"],
+      options: [
+        { name: "Braseros", points: 5 },
+        { name: "Musicien", points: 5 }
+      ],
+      profile: { M:4, CC:2, CT:3, F:3, E:3, PV:1, I:3, A:1, Cd:5 }
+    },
+    {
+      id: 4,
+      name: "Chevaliers du Graal",
+      category: "Rare",
+      points: 180,
+      rules: ["Immunité psychologie", "Attaques magiques", "Bénédiction de la Dame"],
+      options: [
+        { name: "Champion du Graal", points: 20 },
+        { name: "Bannière sacrée", points: 35 }
+      ],
+      profile: { M:4, CC:5, CT:3, F:4, E:4, PV:2, I:5, A:2, Cd:9 }
+    }
+  ];
+
+  const { useState } = React;
+
+  const [selectedUnits, setSelectedUnits] = useState({});
+  const [expandedUnit, setExpandedUnit] = useState(null);
+  const [darkMode, setDarkMode] = useState(true);
+
+  const categoryLimits = { Personnage: 50, Base: 25, Rare: 25 };
+
+  const toggleUnit = (unitId) => {
+    setSelectedUnits((prev) => {
+      const updated = { ...prev };
+      if (updated[unitId]) delete updated[unitId];
+      else updated[unitId] = { selectedOptions: [] };
+      return updated;
+    });
+  };
+
+  const toggleOption = (unitId, optionName) => {
+    setSelectedUnits((prev) => {
+      const updated = { ...prev };
+      const options = updated[unitId].selectedOptions;
+      if (options.includes(optionName)) {
+        updated[unitId].selectedOptions = options.filter(o => o !== optionName);
+      } else {
+        updated[unitId].selectedOptions = [...options, optionName];
+      }
+      return updated;
+    });
+  };
+
+  const calculateTotal = () => {
+    let total = 0;
+    units.forEach(unit => {
+      if (selectedUnits[unit.id]) {
+        total += unit.points;
+        unit.options.forEach(opt => {
+          if (selectedUnits[unit.id].selectedOptions.includes(opt.name)) {
+            total += opt.points;
+          }
+        });
+      }
+    });
+    return total;
+  };
+
+  const calculatePercentages = () => {
+    const totals = { Personnage: 0, Base: 0, Rare: 0 };
+    units.forEach(unit => {
+      if (selectedUnits[unit.id]) totals[unit.category] += unit.points;
+    });
+    const grand = calculateTotal();
+    const res = {};
+    Object.keys(totals).forEach(k => {
+      res[k] = grand ? Math.round((totals[k] / grand) * 100) : 0;
+    });
+    return res;
+  };
+
+  const exportPDF = () => window.print();
+
+  const percentages = calculatePercentages();
+
+  return (
+    <div className={`min-h-screen p-6 ${darkMode ? "bg-stone-900 text-amber-100" : "bg-stone-100 text-stone-900"}`}>
+      <div className="max-w-7xl mx-auto">
+
+        <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold">Armée Bretonnienne</h1>
+            <p className="text-sm opacity-70">Builder interactif + règles + liste</p>
+          </div>
+
+          <div className="flex gap-3">
+            <button onClick={() => setDarkMode(!darkMode)} className="px-4 py-2 bg-amber-700 rounded-xl">
+              Mode
+            </button>
+            <button onClick={exportPDF} className="px-4 py-2 bg-blue-700 rounded-xl">
+              PDF
+            </button>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <div className="lg:col-span-2 space-y-4">
+            {units.map(unit => {
+              const isSelected = !!selectedUnits[unit.id];
+
+              return (
+                <div key={unit.id} className="bg-stone-800 p-4 rounded-xl">
+                  <div className="flex justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold">{unit.name}</h2>
+                      <p>{unit.points} pts</p>
+                    </div>
+                    <button onClick={() => toggleUnit(unit.id)} className="px-3 py-2 bg-green-700 rounded">
+                      {isSelected ? "Retirer" : "Ajouter"}
+                    </button>
+                  </div>
+
+                  {expandedUnit === unit.id && isSelected && (
+                    <div className="mt-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="font-bold">Profil</h3>
+                          <pre className="text-xs">{JSON.stringify(unit.profile, null, 2)}</pre>
+                        </div>
+                        <div>
+                          <h3 className="font-bold">Règles</h3>
+                          <ul>
+                            {unit.rules.map(r => <li key={r}>{r}</li>)}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <aside className="bg-stone-800 p-4 rounded-xl">
+            <h2 className="text-xl font-bold">Liste</h2>
+            <p>Total: {calculateTotal()} pts</p>
+
+            {Object.keys(percentages).map(cat => (
+              <div key={cat}>
+                <p>{cat}: {percentages[cat]}%</p>
+              </div>
+            ))}
+          </aside>
+
+        </div>
+      </div>
+    </div>
+  );
+}
