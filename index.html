@@ -1,190 +1,214 @@
-export default function BretonniaArmyBuilder() {
-  const units = [
-    {
-      id: 1,
-      name: "Seigneur Bretonnien",
-      category: "Personnage",
-      points: 220,
-      rules: ["Vertu héroïque", "Bénédiction de la Dame", "Commandement 9"],
-      options: [
-        { name: "Hippogriffe", points: 200 },
-        { name: "Bouclier enchanté", points: 15 },
-        { name: "Lance de cavalerie", points: 10 }
-      ],
-      profile: { M:4, CC:6, CT:3, F:4, E:4, PV:3, I:5, A:4, Cd:9 }
-    },
-    {
-      id: 2,
-      name: "Chevaliers du Royaume",
-      category: "Base",
-      points: 120,
-      rules: ["Fer de Lance", "Bénédiction de la Dame", "Cavalerie lourde"],
-      options: [
-        { name: "État-major complet", points: 30 },
-        { name: "Bannière magique", points: 25 }
-      ],
-      profile: { M:4, CC:4, CT:3, F:3, E:3, PV:1, I:3, A:1, Cd:8 }
-    },
-    {
-      id: 3,
-      name: "Archers Paysans",
-      category: "Base",
-      points: 70,
-      rules: ["Tirailleurs", "Pieux défensifs"],
-      options: [
-        { name: "Braseros", points: 5 },
-        { name: "Musicien", points: 5 }
-      ],
-      profile: { M:4, CC:2, CT:3, F:3, E:3, PV:1, I:3, A:1, Cd:5 }
-    },
-    {
-      id: 4,
-      name: "Chevaliers du Graal",
-      category: "Rare",
-      points: 180,
-      rules: ["Immunité psychologie", "Attaques magiques", "Bénédiction de la Dame"],
-      options: [
-        { name: "Champion du Graal", points: 20 },
-        { name: "Bannière sacrée", points: 35 }
-      ],
-      profile: { M:4, CC:5, CT:3, F:4, E:4, PV:2, I:5, A:2, Cd:9 }
-    }
-  ];
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bretonnie - Compagnon de Bataille</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=MedievalSharp&family=Roboto:wght@400;500&display=swap');
+        .font-medieval { font-family: 'MedievalSharp', cursive; }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen">
 
-  const { useState } = React;
+    <header class="bg-gradient-to-r from-blue-900 via-indigo-950 to-red-900 border-b-4 border-yellow-600 p-6 shadow-xl text-center">
+        <h1 class="text-4xl md:text-5xl font-medieval text-yellow-400 tracking-wider uppercase drop-shadow-md">Bretonnie — Compagnon de Bataille</h1>
+        <p class="text-xs md:text-sm text-yellow-200 mt-2 italic">"Pour la Dame et le Roy, sus à l'ennemi !"</p>
+    </header>
 
-  const [selectedUnits, setSelectedUnits] = useState({});
-  const [expandedUnit, setExpandedUnit] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
-
-  const categoryLimits = { Personnage: 50, Base: 25, Rare: 25 };
-
-  const toggleUnit = (unitId) => {
-    setSelectedUnits((prev) => {
-      const updated = { ...prev };
-      if (updated[unitId]) delete updated[unitId];
-      else updated[unitId] = { selectedOptions: [] };
-      return updated;
-    });
-  };
-
-  const toggleOption = (unitId, optionName) => {
-    setSelectedUnits((prev) => {
-      const updated = { ...prev };
-      const options = updated[unitId].selectedOptions;
-      if (options.includes(optionName)) {
-        updated[unitId].selectedOptions = options.filter(o => o !== optionName);
-      } else {
-        updated[unitId].selectedOptions = [...options, optionName];
-      }
-      return updated;
-    });
-  };
-
-  const calculateTotal = () => {
-    let total = 0;
-    units.forEach(unit => {
-      if (selectedUnits[unit.id]) {
-        total += unit.points;
-        unit.options.forEach(opt => {
-          if (selectedUnits[unit.id].selectedOptions.includes(opt.name)) {
-            total += opt.points;
-          }
-        });
-      }
-    });
-    return total;
-  };
-
-  const calculatePercentages = () => {
-    const totals = { Personnage: 0, Base: 0, Rare: 0 };
-    units.forEach(unit => {
-      if (selectedUnits[unit.id]) totals[unit.category] += unit.points;
-    });
-    const grand = calculateTotal();
-    const res = {};
-    Object.keys(totals).forEach(k => {
-      res[k] = grand ? Math.round((totals[k] / grand) * 100) : 0;
-    });
-    return res;
-  };
-
-  const exportPDF = () => window.print();
-
-  const percentages = calculatePercentages();
-
-  return (
-    <div className={`min-h-screen p-6 ${darkMode ? "bg-stone-900 text-amber-100" : "bg-stone-100 text-stone-900"}`}>
-      <div className="max-w-7xl mx-auto">
-
-        <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-bold">Armée Bretonnienne</h1>
-            <p className="text-sm opacity-70">Builder interactif + règles + liste</p>
-          </div>
-
-          <div className="flex gap-3">
-            <button onClick={() => setDarkMode(!darkMode)} className="px-4 py-2 bg-amber-700 rounded-xl">
-              Mode
-            </button>
-            <button onClick={exportPDF} className="px-4 py-2 bg-blue-700 rounded-xl">
-              PDF
-            </button>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          <div className="lg:col-span-2 space-y-4">
-            {units.map(unit => {
-              const isSelected = !!selectedUnits[unit.id];
-
-              return (
-                <div key={unit.id} className="bg-stone-800 p-4 rounded-xl">
-                  <div className="flex justify-between">
-                    <div>
-                      <h2 className="text-xl font-bold">{unit.name}</h2>
-                      <p>{unit.points} pts</p>
-                    </div>
-                    <button onClick={() => toggleUnit(unit.id)} className="px-3 py-2 bg-green-700 rounded">
-                      {isSelected ? "Retirer" : "Ajouter"}
-                    </button>
-                  </div>
-
-                  {expandedUnit === unit.id && isSelected && (
-                    <div className="mt-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <h3 className="font-bold">Profil</h3>
-                          <pre className="text-xs">{JSON.stringify(unit.profile, null, 2)}</pre>
-                        </div>
-                        <div>
-                          <h3 className="font-bold">Règles</h3>
-                          <ul>
-                            {unit.rules.map(r => <li key={r}>{r}</li>)}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <aside className="bg-stone-800 p-4 rounded-xl">
-            <h2 className="text-xl font-bold">Liste</h2>
-            <p>Total: {calculateTotal()} pts</p>
-
-            {Object.keys(percentages).map(cat => (
-              <div key={cat}>
-                <p>{cat}: {percentages[cat]}%</p>
-              </div>
-            ))}
-          </aside>
-
+    <div class="sticky top-0 bg-gray-800 bg-opacity-95 border-b border-yellow-600 shadow-md z-50 p-4 transition-all">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-yellow-500 font-medieval text-lg hidden sm:inline">Règles de l'Armée active :</span>
+                <span class="bg-blue-800 text-xs px-2 py-1 rounded text-blue-100 font-semibold border border-blue-400">Bénédiction de la Dame</span>
+                <span class="bg-red-800 text-xs px-2 py-1 rounded text-red-100 font-semibold border border-red-400">Fer de Lance</span>
+            </div>
+            <div class="bg-yellow-600 text-gray-900 font-medieval font-bold px-4 py-2 rounded shadow text-lg md:text-xl">
+                Total : <span id="total-points">0</span> pts
+            </div>
         </div>
-      </div>
     </div>
-  );
-}
+
+    <main class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <section class="lg:col-span-2 space-y-6">
+            <h2 class="text-2xl font-medieval text-yellow-400 border-b border-gray-700 pb-2">Sélection des Hostes</h2>
+
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-inner">
+                <h3 class="text-lg font-cinzel text-blue-400 font-bold mb-3 border-b border-gray-700 pb-1">Seigneurs & Héros</h3>
+                <div class="space-y-4">
+                    <div class="unit-card bg-gray-850 p-3 rounded border border-gray-700 hover:border-yellow-600 transition" data-base-pts="140">
+                        <div class="flex justify-between items-start">
+                            <label class="flex items-center gap-3 cursor-pointer text-base font-semibold text-yellow-100">
+                                <input type="checkbox" class="unit-toggle w-5 h-5 accent-yellow-500 rounded">
+                                Seigneur Bretonnien (140 pts)
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1 italic">Règles : Vertu de l'Héroïsme, Présence Charismatique, Serment du Chevalier</p>
+                        <div class="options-container hidden mt-3 pl-8 space-y-2 border-l-2 border-blue-900">
+                            <label class="flex items-center gap-2 text-xs text-gray-300">
+                                <input type="checkbox" data-points="21" class="option-toggle accent-blue-500"> Destrier Caparaçonné (+21 pts)
+                            </label>
+                            <label class="flex items-center gap-2 text-xs text-gray-300">
+                                <input type="checkbox" data-points="20" class="option-toggle accent-blue-500"> Serment du Graal (+20 pts)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="unit-card bg-gray-850 p-3 rounded border border-gray-700 hover:border-yellow-600 transition" data-base-pts="105">
+                        <div class="flex justify-between items-start">
+                            <label class="flex items-center gap-3 cursor-pointer text-base font-semibold text-yellow-100">
+                                <input type="checkbox" class="unit-toggle w-5 h-5 accent-yellow-500 rounded">
+                                Demoiselle du Graal (105 pts)
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1 italic">Règles : Résistance à la Magie (1), Attaques Magiques</p>
+                        <div class="options-container hidden mt-3 pl-8 space-y-2 border-l-2 border-blue-900">
+                            <label class="flex items-center gap-2 text-xs text-gray-300">
+                                <input type="checkbox" data-points="35" class="option-toggle accent-blue-500"> Niveau de Magie 2 (+35 pts)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-inner">
+                <h3 class="text-lg font-cinzel text-green-400 font-bold mb-3 border-b border-gray-700 pb-1">Unités de Base</h3>
+                <div class="space-y-4">
+                    <div class="unit-card bg-gray-850 p-3 rounded border border-gray-700 hover:border-yellow-600 transition" data-is-scalable="true">
+                        <div class="flex justify-between items-center flex-wrap gap-2">
+                            <label class="flex items-center gap-3 cursor-pointer text-base font-semibold text-yellow-100">
+                                <input type="checkbox" class="unit-toggle w-5 h-5 accent-yellow-500 rounded">
+                                Chevaliers du Royaume (24 pts/fig)
+                            </label>
+                            <div class="flex items-center gap-2 text-xs text-gray-300 ml-8">
+                                <span>Effectif :</span>
+                                <input type="number" min="5" value="5" data-pts-per-fig="24" class="unit-qty w-14 bg-gray-700 border border-gray-600 rounded p-1 text-center font-bold text-white">
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1 italic">Règles : Fer de Lance, Contre-charge, Serment du Chevalier</p>
+                        <div class="options-container hidden mt-3 pl-8 space-y-2 border-l-2 border-green-900">
+                            <label class="flex items-center gap-2 text-xs text-gray-300">
+                                <input type="checkbox" data-points="24" class="option-toggle accent-green-500"> État-Major Complet (+24 pts)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="unit-card bg-gray-850 p-3 rounded border border-gray-700 hover:border-yellow-600 transition" data-is-scalable="true">
+                        <div class="flex justify-between items-center flex-wrap gap-2">
+                            <label class="flex items-center gap-3 cursor-pointer text-base font-semibold text-yellow-100">
+                                <input type="checkbox" class="unit-toggle w-5 h-5 accent-yellow-500 rounded">
+                                Archers Paysans (7 pts/fig)
+                            </label>
+                            <div class="flex items-center gap-2 text-xs text-gray-300 ml-8">
+                                <span>Effectif :</span>
+                                <input type="number" min="10" value="10" data-pts-per-fig="7" class="unit-qty w-14 bg-gray-700 border border-gray-600 rounded p-1 text-center font-bold text-white">
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1 italic">Règles : Devoir du Paysan, Pieux Défensifs, Tir de Volée</p>
+                        <div class="options-container hidden mt-3 pl-8 space-y-2 border-l-2 border-green-900">
+                            <label class="flex items-center gap-2 text-xs text-gray-300">
+                                <input type="checkbox" data-points="5" class="option-toggle accent-green-500"> Flèches Enflammées (+5 pts global)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-6">
+            <h2 class="text-2xl font-medieval text-yellow-400 border-b border-gray-700 pb-2">Grimoire des Règles</h2>
+            
+            <div class="bg-gray-800 p-4 rounded-lg border border-yellow-700 space-y-4 shadow-md max-h-[75vh] overflow-y-auto">
+                <div>
+                    <h4 class="text-yellow-500 font-medieval font-bold text-md">Bénédiction de la Dame</h4>
+                    <p class="text-xs text-gray-300 leading-relaxed mt-1">
+                        Accorde une sauvegarde invulnérable de 6+ (5+ contre les attaques de force 5 ou plus). Perdue si l'unité fuit ou si un personnage refuse un défi.
+                    </p>
+                </div>
+                <hr class="border-gray-700">
+                <div>
+                    <h4 class="text-yellow-500 font-medieval font-bold text-md">Formation en Fer de Lance</h4>
+                    <p class="text-xs text-gray-300 leading-relaxed mt-1">
+                        Permet aux chevaliers de combattre sur les flancs de la formation. Le bonus de rang est calculé différemment (par lignes de 3 figurines).
+                    </p>
+                </div>
+                <hr class="border-gray-700">
+                <div>
+                    <h4 class="text-yellow-500 font-medieval font-bold text-md">Devoir du Paysan</h4>
+                    <p class="text-xs text-gray-300 leading-relaxed mt-1">
+                        Les unités de paysans peuvent utiliser le Commandement de n'importe quel Chevalier non-fuyard à moins de 6 pouces.
+                    </p>
+                </div>
+                <hr class="border-gray-700">
+                <div>
+                    <h4 class="text-yellow-500 font-medieval font-bold text-md">Pieux Défensifs</h4>
+                    <p class="text-xs text-gray-300 leading-relaxed mt-1">
+                        Déployés au début de la partie. Offrent un obstacle défendu contre les charges ennemies de face au premier tour de mêlée.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const unitCards = document.querySelectorAll('.unit-card');
+            const totalPointsElem = document.getElementById('total-points');
+
+            function calculateTotal() {
+                let total = 0;
+
+                unitCards.forEach(card => {
+                    const toggle = card.querySelector('.unit-toggle');
+                    const optionsContainer = card.querySelector('.options-container');
+                    
+                    if (toggle.checked) {
+                        // Afficher les options si l'unité est sélectionnée
+                        if (optionsContainer) optionsContainer.classList.remove('hidden');
+                        
+                        let unitCost = 0;
+                        const isScalable = card.getAttribute('data-is-scalable') === 'true';
+
+                        if (isScalable) {
+                            const qtyInput = card.querySelector('.unit-qty');
+                            const ptsPerFig = parseInt(qtyInput.getAttribute('data-pts-per-fig')) || 0;
+                            const qty = parseInt(qtyInput.value) || 0;
+                            unitCost += (qty * ptsPerFig);
+                        } else {
+                            unitCost += parseInt(card.getAttribute('data-base-pts')) || 0;
+                        }
+
+                        // Ajouter le coût des options cochées
+                        const optionToggles = card.querySelectorAll('.option-toggle:checked');
+                        optionToggles.forEach(opt => {
+                            unitCost += parseInt(opt.getAttribute('data-points')) || 0;
+                        });
+
+                        total += unitCost;
+                    } else {
+                        // Cacher les options si décochée
+                        if (optionsContainer) optionsContainer.classList.add('hidden');
+                    }
+                });
+
+                totalPointsElem.innerText = total;
+            }
+
+            // Écouteurs d'événements pour mettre à jour en temps réel
+            document.querySelectorAll('.unit-toggle, .option-toggle').forEach(element => {
+                element.addEventListener('change', calculateTotal);
+            });
+
+            document.querySelectorAll('.unit-qty').forEach(element => {
+                element.addEventListener('input', calculateTotal);
+            });
+
+            // Initialisation au chargement
+            calculateTotal();
+        });
+    </script>
+</body>
+</html>
