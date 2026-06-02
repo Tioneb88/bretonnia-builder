@@ -24,7 +24,7 @@
                 <span class="bg-blue-900 text-blue-100 px-2 py-1 rounded font-semibold border border-blue-500">Bénédiction de la Dame (Sauv. Invulnérable)</span>
                 <span class="bg-red-950 text-red-100 px-2 py-1 rounded font-semibold border border-red-500">Formation en Fer de Lance</span>
             </div>
-            <div class="bg-yellow-600 text-gray-950 font-medieval font-bold px-5 py-2 rounded text-xl shadow-lg animate-pulse-slow">
+            <div class="bg-yellow-600 text-gray-955 font-medieval font-bold px-5 py-2 rounded text-xl shadow-lg">
                 Total : <span id="global-total">0</span> pts
             </div>
         </div>
@@ -54,8 +54,10 @@
                 <button onclick="clearArmy()" class="text-xs bg-red-900 hover:bg-red-700 text-white px-2 py-1 rounded transition">Vider la liste</button>
             </div>
             
-            <div id="army-container" class="flex-1 overflow-y-auto space-y-4 pr-1">
+            <div id="army-container" class="flex-1 overflow-y-auto pr-1">
                 <div id="empty-message" class="text-center text-gray-500 py-12 italic">Aucune unité déployée. Cliquez sur le bouton "+" du catalogue pour lever votre armée.</div>
+                
+                <div id="army-list" class="space-y-4"></div>
             </div>
         </section>
 
@@ -73,12 +75,11 @@
     </main>
 
     <script>
-        // --- BASE DE DONNÉES COMPLÈTE DU CODEX BRETONNIEN ---
         const CODEX = {
             units: [
                 // Personnages Spéciaux
                 { id: 'louen', cat: 'hero_spec', name: 'Louen Cœur de Lion', basePts: 728, unique: true, rules: ['Bénédiction de la Dame', 'Fer de Lance', 'Présence Charismatique (18")', 'Grande Cible', 'Régénération'], options: [] },
-                { id: 'green_knight', cat: 'hero_spec', name: 'Le Chevalier Vert', basePts: 275, unique: true, rules: ['Bénédiction de la Dame', 'Éthéré', 'Esprit de la Terre', 'Attaques Magiques'], options: [] },
+                { id: 'green_knight', cat: 'hero_spec', name: 'Le Chevalier de Sinople', basePts: 275, unique: true, rules: ['Bénédiction de la Dame', 'Éthéré', 'Esprit de la Terre', 'Attaques Magiques'], options: [] },
                 { id: 'fay', cat: 'hero_spec', name: 'La Fée Enchanteresse', basePts: 545, unique: true, rules: ['Bénédiction de la Dame', 'Maître de la Magie (Niv 4)', 'Aura de Pureté'], options: [] },
                 { id: 'repanse', cat: 'hero_spec', name: 'Repanse de Lyonesse', basePts: 220, unique: true, rules: ['Vertu de Dévotion', 'Sceau de Lyonesse'], options: [] },
                 
@@ -105,7 +106,7 @@
                 { id: 'trebuchet', cat: 'rare', name: 'Trébuchet de la Bretagne', basePts: 90, rules: ['Devoir du Paysan', 'Catapulte (Force 4/10)'], options: [{name:'Artisan Charpentier', pts:10}] }
             ],
             rules: {
-                'Bénédiction de la Dame': 'Sauvegarde invulnérable de 6+ globale, passant à 5+ contre les attaques de Force 5 ou plus. Perdue si l\'unité s\'enfuit.',
+                'Bénédiction de la Dame': 'Sauvegarde invulnérable de 6+ globale, passant à 5+ contre les attaques de Force 5 ou plus. Perdu si l\'unité fuit.',
                 'Formation en Fer de Lance': 'Formation triangulaire unique. Permet à toutes les figurines sur les flancs extérieurs d\'attaquer lors d\'une charge.',
                 'Devoir du Paysan': 'Les unités possédant cette règle ignorent la panique des autres paysans et peuvent utiliser le Commandement de tout Chevalier à moins de 6".',
                 'Pieux Défensifs': 'Obstacle léger déployé devant l\'unité d\'archers au début de la partie. Confère des bonus défensifs contre les charges frontales.',
@@ -126,14 +127,12 @@
 
         let myArmy = [];
 
-        // --- ENREGISTREMENT ET CHARGEMENT ---
         function init() {
             renderCatalog();
             renderGrimoire('rules');
             renderArmy();
         }
 
-        // --- AFFICHAGE DU CATALOGUE ---
         function renderCatalog() {
             const filter = document.getElementById('catalog-filter').value;
             const container = document.getElementById('catalog-container');
@@ -158,19 +157,16 @@
             });
         }
 
-        // --- GESTION DE L'ARMÉE ACTIVE ---
         function addUnitToArmy(unitId) {
             const template = CODEX.units.find(u => u.id === unitId);
             
-            // Vérification règle unique (ex: Louen)
             if (template.unique && myArmy.some(u => u.id === unitId)) {
                 alert(`👑 ${template.name} est un personnage unique et ne peut être aligné qu'une seule fois !`);
                 return;
             }
 
-            // Structure d'une instance unique d'unité
             const newInstance = {
-                instanceId: Date.now() + Math.random().toString(36).substr(2, 5),
+                instanceId: 'inst_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
                 id: template.id,
                 name: template.name,
                 basePts: template.basePts || 0,
@@ -194,7 +190,6 @@
             const unit = myArmy.find(u => u.instanceId === instanceId);
             if (unit) {
                 unit.qty = parseInt(val) || 1;
-                renderArmy(false); // update totals directly without complete rebuilding elements to loose focus
                 recalculateTotal();
             }
         }
@@ -218,7 +213,6 @@
             }
         }
 
-        // --- RECALCUL DU COÛT GLOBAL ---
         function recalculateTotal() {
             let globalTotal = 0;
 
@@ -230,7 +224,6 @@
                     unitTotal += unit.basePts;
                 }
 
-                // Options
                 unit.selectedOptions.forEach(optName => {
                     const optionData = unit.availableOptions.find(o => o.name === optName);
                     if (optionData) unitTotal += optionData.pts;
@@ -238,7 +231,6 @@
 
                 globalTotal += unitTotal;
                 
-                // Mettre à jour l'affichage individuel des points
                 const badge = document.getElementById(`pts-badge-${unit.instanceId}`);
                 if (badge) badge.innerText = `${unitTotal} pts`;
             });
@@ -246,30 +238,27 @@
             document.getElementById('global-total').innerText = globalTotal;
         }
 
-        // --- RENDU GRAPHIQUE DE L'ARMÉE ---
         function renderArmy(rebuildHTML = true) {
-            const container = document.getElementById('army-container');
+            const listContainer = document.getElementById('army-list');
             const emptyMsg = document.getElementById('empty-message');
 
             if (myArmy.length === 0) {
                 emptyMsg.classList.remove('hidden');
-                if (rebuildHTML) container.innerHTML = '';
-                container.appendChild(emptyMsg);
+                listContainer.innerHTML = '';
                 document.getElementById('global-total').innerText = 0;
                 return;
             } else {
                 emptyMsg.classList.add('hidden');
             }
 
-            if (!rebuildHTML) return; // Si on ne reconstruit pas, on s'arrête là pour préserver les inputs
+            if (!rebuildHTML) return;
 
-            container.innerHTML = '';
+            listContainer.innerHTML = '';
 
             myArmy.forEach(unit => {
                 const card = document.createElement('div');
                 card.className = "bg-slate-900 border border-gray-800 rounded-xl p-4 shadow relative hover:border-yellow-700 transition";
                 
-                // Création du bloc d'options
                 let optionsHTML = '';
                 if (unit.availableOptions && unit.availableOptions.length > 0) {
                     optionsHTML = `<div class="mt-3 pt-2 border-t border-gray-800 space-y-1.5">`;
@@ -285,78 +274,7 @@
                     optionsHTML += `</div>`;
                 }
 
-                // Ajustement de la quantité si l'unité est scalable
                 let qtyHTML = '';
                 if (unit.perFigPts) {
                     qtyHTML = `
                         <div class="flex items-center gap-2 mt-2 sm:mt-0">
-                            <span class="text-xs text-gray-400">Effectif:</span>
-                            <input type="number" min="1" value="${unit.qty}" oninput="updateQty('${unit.instanceId}', this.value)" class="w-14 bg-gray-800 text-white text-center font-bold text-xs rounded p-1 border border-gray-700">
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start flex-wrap gap-2">
-                        <div>
-                            <h3 class="font-cinzel font-bold text-sm text-yellow-400">${unit.name}</h3>
-                            <p class="text-[10px] text-gray-400 italic max-w-sm mt-0.5">Règles : ${unit.rules.join(', ')}</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            ${qtyHTML}
-                            <span id="pts-badge-${unit.instanceId}" class="bg-gray-800 text-yellow-500 font-bold text-xs px-2 py-1 rounded border border-gray-700">
-                                0 pts
-                            </span>
-                            <button onclick="removeUnitInstance('${unit.instanceId}')" class="text-gray-500 hover:text-red-500 text-sm font-bold pl-1">
-                                🗑️
-                            </button>
-                        </div>
-                    </div>
-                    ${optionsHTML}
-                `;
-
-                container.appendChild(card);
-            });
-
-            recalculateTotal();
-        }
-
-        // --- NAVIGATION DU GRIMOIRE DE RÈGLES ---
-        function switchGrimoire(tab) {
-            const btnRules = document.getElementById('tab-rules');
-            const btnItems = document.getElementById('tab-items');
-
-            if(tab === 'rules') {
-                btnRules.className = "flex-1 py-1 px-2 font-bold bg-yellow-600 text-gray-950 rounded";
-                btnItems.className = "flex-1 py-1 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700";
-            } else {
-                btnItems.className = "flex-1 py-1 px-2 font-bold bg-yellow-600 text-gray-950 rounded";
-                btnRules.className = "flex-1 py-1 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700";
-            }
-            renderGrimoire(tab);
-        }
-
-        function renderGrimoire(type) {
-            const container = document.getElementById('grimoire-content');
-            container.innerHTML = '';
-
-            const data = CODEX[type];
-            for (const [key, val] of Object.entries(data)) {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = "bg-gray-850 p-2 rounded border border-gray-800";
-                itemDiv.innerHTML = `
-                    <h5 class="text-yellow-500 font-bold font-medieval tracking-wide">${key}</h5>
-                    <p class="text-gray-400 mt-1 leading-relaxed text-[11px]">${val}</p>
-                `;
-                container.appendChild(itemDiv);
-            }
-        }
-
-        // Écouteur pour le filtre du catalogue
-        document.getElementById('catalog-filter').addEventListener('change', renderCatalog);
-
-        // Lancement initial
-        window.onload = init;
-    </script>
-</body>
-</html>
