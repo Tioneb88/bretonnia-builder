@@ -9,57 +9,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght=600;800&family=MedievalSharp&family=Roboto:wght=400;500&display=swap');
         .font-medieval { font-family: 'MedievalSharp', cursive; }
         .font-cinzel { font-family: 'Cinzel', serif; }
-        
-        /* Styles spécifiques pour l'impression PDF via la fonction d'export */
-        @media print {
-            body { background: white !important; color: black !important; }
-            .no-print { display: none !important; }
-            .print-card { border: 1px solid #000 !important; background: transparent !important; color: black !important; page-break-inside: avoid; }
-            .print-text-dark { color: black !important; }
-        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-gradient-to-r from-blue-950 via-slate-900 to-red-950 border-b-4 border-yellow-600 p-4 shadow-2xl text-center no-print">
+    <header class="bg-gradient-to-r from-blue-950 via-slate-900 to-red-950 border-b-4 border-yellow-600 p-4 shadow-2xl text-center">
         <h1 class="text-3xl md:text-5xl font-medieval text-yellow-400 tracking-widest uppercase drop-shadow">Générateur d'Armée : Bretonnie</h1>
         <p class="text-xs md:text-sm text-yellow-200 mt-1 italic">"Honneur, Devoir, et Fidélité à la Dame du Lac"</p>
     </header>
 
-    <div class="sticky top-0 bg-gray-900 bg-opacity-95 border-b border-yellow-600 shadow-md z-50 p-3 no-print">
-        <div class="max-w-8xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="grid grid-cols-5 gap-2 w-full md:w-auto text-[10px] md:text-xs flex-1 max-w-3xl">
-                <div class="bg-gray-950 p-1.5 rounded border border-gray-800 text-center">
-                    <span class="block text-gray-400 font-medium">Perso. Spé.</span>
-                    <span id="pct-hero_spec" class="font-bold text-blue-400">0%</span>
-                </div>
-                <div class="bg-gray-950 p-1.5 rounded border border-gray-800 text-center">
-                    <span class="block text-gray-400 font-medium">Seig. & Héros</span>
-                    <span id="pct-heroes" class="font-bold text-purple-400">0%</span>
-                </div>
-                <div class="bg-gray-950 p-1.5 rounded border border-gray-800 text-center">
-                    <span class="block text-gray-400 font-medium">Base (min 25%)</span>
-                    <span id="pct-core" class="font-bold text-green-400">0%</span>
-                </div>
-                <div class="bg-gray-950 p-1.5 rounded border border-gray-800 text-center">
-                    <span class="block text-gray-400 font-medium">Spéciales</span>
-                    <span id="pct-special" class="font-bold text-yellow-500">0%</span>
-                </div>
-                <div class="bg-gray-950 p-1.5 rounded border border-gray-800 text-center">
-                    <span class="block text-gray-400 font-medium">Rares</span>
-                    <span id="pct-rare" class="font-bold text-red-400">0%</span>
-                </div>
-            </div>
-            
-            <div class="bg-yellow-600 text-gray-900 font-medieval font-bold px-5 py-2 rounded text-xl shadow-lg whitespace-nowrap">
-                Total : <span id="global-total">0</span> pts
-            </div>
-        </div>
-    </div>
-
     <main class="flex-1 max-w-8xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <section class="lg:col-span-4 bg-gray-900 p-4 rounded-xl border border-gray-800 flex flex-col h-[75vh] no-print">
+        <section class="lg:col-span-4 bg-gray-900 p-4 rounded-xl border border-gray-800 flex flex-col h-[80vh]">
             <h2 class="text-xl font-medieval text-yellow-400 border-b border-gray-700 pb-2 mb-3">📜 Roster de la Cour d'Artois</h2>
             
             <select id="catalog-filter" class="w-full bg-gray-800 border border-gray-700 rounded p-2 mb-4 text-yellow-300 font-medium focus:outline-none focus:border-yellow-600">
@@ -75,29 +36,58 @@
                 </div>
         </section>
 
-        <section class="lg:col-span-5 bg-gray-900 p-4 rounded-xl border border-yellow-900 flex flex-col h-[75vh]">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-3 no-print">
+        <section class="lg:col-span-5 bg-gray-900 p-4 rounded-xl border-2 border-yellow-600 flex flex-col h-[80vh]">
+            
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-3">
                 <h2 class="text-xl font-medieval text-yellow-400">⚔️ Votre Hoste de Bataille</h2>
-                <div class="flex gap-2">
-                    <button onclick="exportToPDF()" class="text-xs bg-blue-700 hover:bg-blue-600 text-white px-2.5 py-1 rounded font-medium transition flex items-center gap-1">📄 PDF</button>
-                    <button onclick="clearArmy()" class="text-xs bg-red-900 hover:bg-red-700 text-white px-2 py-1 rounded transition">Vider</button>
+                <span class="bg-yellow-600 text-gray-950 font-medieval font-bold px-3 py-1 rounded text-lg">
+                    Total : <span id="global-total">0</span> pts
+                </span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <button onclick="exportToPDF()" class="col-span-2 bg-blue-700 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded transition flex items-center justify-center gap-2 shadow-md">
+                    📄 EXPORTER L'HOSTE EN PDF
+                </button>
+                <button onclick="clearArmy()" class="bg-red-950 hover:bg-red-900 text-red-200 text-xs border border-red-700 rounded transition">
+                    Vider la liste
+                </button>
+            </div>
+
+            <div class="bg-gray-950 p-3 rounded-lg border border-gray-800 mb-4 space-y-2">
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">⚖️ Ratios de Composition de l'Armée :</div>
+                
+                <div class="grid grid-cols-5 gap-2 text-center text-[10px] font-medium text-gray-400">
+                    <div>Perso. Spé.<span id="pct-hero_spec" class="block text-sm font-bold text-gray-200">0%</span></div>
+                    <div>Sg & Héros<span id="pct-heroes" class="block text-sm font-bold text-gray-200">0%</span></div>
+                    <div>Base (min 25%)<span id="pct-core" class="block text-sm font-bold text-red-400">0%</span></div>
+                    <div>Spéciales<span id="pct-special" class="block text-sm font-bold text-gray-200">0%</span></div>
+                    <div>Rares<span id="pct-rare" class="block text-sm font-bold text-gray-200">0%</span></div>
+                </div>
+
+                <div class="grid grid-cols-5 gap-1.5 h-1.5 mt-1">
+                    <div class="bg-gray-800 rounded-full overflow-hidden"><div id="bar-hero_spec" class="bg-blue-500 h-full w-0 transition-all duration-300"></div></div>
+                    <div class="bg-gray-800 rounded-full overflow-hidden"><div id="bar-heroes" class="bg-purple-500 h-full w-0 transition-all duration-300"></div></div>
+                    <div class="bg-gray-800 rounded-full overflow-hidden"><div id="bar-core" class="bg-red-500 h-full w-0 transition-all duration-300"></div></div>
+                    <div class="bg-gray-800 rounded-full overflow-hidden"><div id="bar-special" class="bg-yellow-500 h-full w-0 transition-all duration-300"></div></div>
+                    <div class="bg-gray-800 rounded-full overflow-hidden"><div id="bar-rare" class="bg-red-400 h-full w-0 transition-all duration-300"></div></div>
                 </div>
             </div>
             
             <div class="flex-1 overflow-y-auto pr-1">
-                <div id="army-list" class="space-y-6"></div>
+                <div id="army-list" class="space-y-4"></div>
             </div>
         </section>
 
-        <section class="lg:col-span-3 bg-gray-900 p-4 rounded-xl border border-gray-800 flex flex-col h-[75vh] no-print">
+        <section class="lg:col-span-3 bg-gray-900 p-4 rounded-xl border border-gray-800 flex flex-col h-[80vh]">
             <h2 class="text-xl font-medieval text-yellow-400 border-b border-gray-700 pb-2 mb-3">📚 Grimoire & Arsenal</h2>
             
             <div class="flex gap-2 mb-3 text-xs">
-                <button onclick="switchGrimoire('rules')" id="tab-rules" class="flex-1 py-1 px-2 font-bold bg-yellow-600 text-gray-950 rounded">Règles</button>
-                <button onclick="switchGrimoire('items')" id="tab-items" class="flex-1 py-1 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700">Objets & Vertus</button>
+                <button onclick="switchGrimoire('rules')" id="tab-rules" class="flex-1 py-1.5 px-2 font-bold bg-yellow-600 text-gray-950 rounded">Règles</button>
+                <button onclick="switchGrimoire('items')" id="tab-items" class="flex-1 py-1.5 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700">Objets & Vertus</button>
             </div>
 
-            <div id="grimoire-content" class="flex-1 overflow-y-auto space-y-4 text-xs text-gray-300 pr-1">
+            <div id="grimoire-content" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300 pr-1">
                 </div>
         </section>
     </main>
@@ -113,60 +103,52 @@
 
         const CODEX = {
             units: [
-                { id: 'louen', cat: 'hero_spec', name: 'Louen Cœur de Lion', basePts: 728, unique: true, rules: ['Bénédiction de la Dame', 'Fer de Lance', 'Présence Charismatique (18")', 'Grande Cible', 'Régénération'], options: [] },
-                { id: 'green_knight', cat: 'hero_spec', name: 'Le Chevalier de Sinople', basePts: 275, unique: true, rules: ['Bénédiction de la Dame', 'Éthéré', 'Esprit de la Terre', 'Attaques Magiques'], options: [] },
-                { id: 'fay', cat: 'hero_spec', name: 'La Fée Enchanteresse', basePts: 545, unique: true, rules: ['Bénédiction de la Dame', 'Maître de la Magie (Niv 4)', 'Aura de Pureté'], options: [] },
-                { id: 'repanse', cat: 'hero_spec', name: 'Repanse de Lyonesse', basePts: 220, unique: true, rules: ['Vertu de Dévotion', 'Sceau de Lyonesse'], options: [] },
+                { id: 'louen', cat: 'hero_spec', name: 'Louen Cœur de Lion', basePts: 728, unique: true, rules: ['Bénédiction de la Dame', 'Fer de Lance', 'Grande Cible', 'Régénération'] },
+                { id: 'green_knight', cat: 'hero_spec', name: 'Le Chevalier de Sinople', basePts: 275, unique: true, rules: ['Bénédiction de la Dame', 'Éthéré', 'Attaques Magiques'] },
+                { id: 'fay', cat: 'hero_spec', name: 'La Fée Enchanteresse', basePts: 545, unique: true, rules: ['Bénédiction de la Dame', 'Maître de la Magie (Niv 4)', 'Aura de Pureté'] },
+                { id: 'repanse', cat: 'hero_spec', name: 'Repanse de Lyonesse', basePts: 220, unique: true, rules: ['Vertu de Dévotion', 'Sceau de Lyonesse'] },
                 
                 { id: 'lord', cat: 'heroes', name: 'Seigneur Bretonnien', basePts: 140, rules: ['Serment du Chevalier', 'Présence Charismatique'], options: [{name:'Destrier Caparaçonné', pts:21}, {name:'Serment du Graal', pts:20}, {name:'Serment de la Quête', pts:12}] },
-                { id: 'paladin', cat: 'heroes', name: 'Paladin (Porte-Bannière)', basePts: 60, rules: ['Serment du Chevalier', 'Tenir la Ligne !'], options: [{name:'Grande Bannière', pts:25}, {name:'Destrier Caparaçonné', pts:14}] },
-                { id: 'prophetess', cat: 'heroes', name: 'Prophétesse du Graal', basePts: 175, rules: ['Résistance à la Magie (2)', 'Compagnon de la Dame'], options: [{name:'Niveau de Magie 4', pts:35}, {name:'Destrier', pts:15}] },
+                { id: 'paladin', cat: 'heroes', name: 'Paladin (Porte-Bannière)', basePts: 60, rules: ['Serment du Chevalier'], options: [{name:'Grande Bannière', pts:25}, {name:'Destrier Caparaçonné', pts:14}] },
+                { id: 'prophetess', cat: 'heroes', name: 'Prophétesse du Graal', basePts: 175, rules: ['Résistance à la Magie (2)'], options: [{name:'Niveau de Magie 4', pts:35}, {name:'Destrier', pts:15}] },
                 { id: 'damoiselle', cat: 'heroes', name: 'Demoiselle du Graal', basePts: 105, rules: ['Résistance à la Magie (1)'], options: [{name:'Niveau de Magie 2', pts:35}] },
                 
-                { id: 'cotr', cat: 'core', name: 'Chevaliers du Royaume', perFigPts: 24, min: 5, rules: ['Fer de Lance', 'Serment du Chevalier'], options: [{name:'Champion', pts:16}, {name:'Musicien', pts:8}, {name:'Porte-étendard', pts:16}] },
-                { id: 'errants', cat: 'core', name: 'Chevaliers Errants', perFigPts: 20, min: 5, rules: ['Fer de Lance', 'Impétueux', 'Serment Errant'], options: [{name:'État-Major Complet', pts:21}] },
+                { id: 'cotr', cat: 'core', name: 'Chevaliers du Royaume', perFigPts: 24, min: 5, rules: ['Fer de Lance', 'Serment du Chevalier'], options: [{name:'État-Major Complet', pts:24}] },
+                { id: 'errants', cat: 'core', name: 'Chevaliers Errants', perFigPts: 20, min: 5, rules: ['Fer de Lance', 'Impétueux'], options: [{name:'État-Major Complet', pts:21}] },
                 { id: 'men_at_arms', cat: 'core', name: 'Hommes d\'Armes', perFigPts: 5, min: 10, rules: ['Devoir du Paysan', 'Hallebarde & Bouclier'], options: [{name:'État-Major Complet', pts:15}] },
-                { id: 'peasant_bowmen', cat: 'core', name: 'Archers Paysans', perFigPts: 6, min: 10, rules: ['Devoir du Paysan', 'Pieux Défensifs', 'Tir de Volée'], options: [{name:'Flèches Enflammées', pts:5}, {name:'Braies de pieux', pts:10}] },
+                { id: 'peasant_bowmen', cat: 'core', name: 'Archers Paysans', perFigPts: 6, min: 10, rules: ['Devoir du Paysan', 'Pieux Défensifs'], options: [{name:'Flèches Enflammées', pts:5}] },
                 
-                { id: 'pegasus_knights', cat: 'special', name: 'Chevaliers sur Pégase', perFigPts: 55, min: 3, rules: ['Cavalerie Volante', 'Fer de Lance', 'Serment du Chevalier'], options: [{name:'Champion Châtelain', pts:20}] },
-                { id: 'quest_knights', cat: 'special', name: 'Chevaliers de la Quête', perFigPts: 28, min: 5, rules: ['Fer de Lance', 'Arme Lourde', 'Serment de la Quête'], options: [{name:'État-Major Complet', pts:27}] },
+                { id: 'pegasus_knights', cat: 'special', name: 'Chevaliers sur Pégase', perFigPts: 55, min: 3, rules: ['Cavalerie Volante', 'Fer de Lance'], options: [{name:'Champion Châtelain', pts:20}] },
+                { id: 'quest_knights', cat: 'special', name: 'Chevaliers de la Quête', perFigPts: 28, min: 5, rules: ['Fer de Lance', 'Arme Lourde'], options: [{name:'État-Major Complet', pts:27}] },
                 { id: 'mounted_yeomen', cat: 'special', name: 'Sergents Montés', perFigPts: 15, min: 5, rules: ['Devoir du Paysan', 'Cavalerie Légère'], options: [{name:'Boucliers', pts:1}] },
-                { id: 'grail_reliquary', cat: 'special', name: 'Pèlerins du Graal & Reliquaire', basePts: 118, perFigPts: 9, min: 6, rules: ['Devoir du Paysan', 'Haine', 'Tenaces'], options: [] },
+                { id: 'grail_reliquary', cat: 'special', name: 'Pèlerins & Reliquaire', basePts: 118, perFigPts: 9, min: 6, rules: ['Devoir du Paysan', 'Tenaces'], options: [] },
 
                 { id: 'grail_knights', cat: 'rare', name: 'Chevaliers du Graal', perFigPts: 38, min: 3, rules: ['Fer de Lance', 'Serment du Graal', 'Attaques Magiques'], options: [{name:'Bannière de Châlons', pts:10}] },
-                { id: 'trebuchet', cat: 'rare', name: 'Trébuchet de la Bretagne', basePts: 90, rules: ['Devoir du Paysan', 'Catapulte (Force 4/10)'], options: [{name:'Artisan Charpentier', pts:10}] }
+                { id: 'trebuchet', cat: 'rare', name: 'Trébuchet de la Bretagne', basePts: 90, rules: ['Devoir du Paysan', 'Catapulte'], options: [{name:'Artisan Charpentier', pts:10}] }
             ],
             rules: {
-                'Bénédiction de la Dame': 'Sauvegarde invulnérable de 6+ globale, passant à 5+ contre les attaques de Force 5 ou plus.',
-                'Formation en Fer de Lance': 'Permet à toutes les figurines sur les flancs extérieurs d'attaquer lors d'une charge.',
-                'Devoir du Paysan': 'Ignore la panique des autres paysans et utilise le Commandement d'un Chevalier à moins de 6".',
-                'Serment du Chevalier': 'Immunisé à la panique causée par les paysans. Ne peut pas rejoindre leur unité.'
+                'Bénédiction de la Dame': 'Sauvegarde invulnérable de 6+ (5+ contre F5+).',
+                'Fer de Lance': 'Permet aux figurines sur les flancs extérieurs de délivrer leurs attaques en charge.',
+                'Devoir du Paysan': 'Ignore la panique des paysans et utilise le Commandement des Chevaliers proches.',
+                'Serment du Chevalier': 'Immunisé à la panique causée par les paysans.'
             },
             items: {
-                "--- VERTUS BRETONNIENNES ---": "Disponibles pour les Seigneurs et Paladins.",
-                "Vertu d'Héroïsme (+40 pts)": "Le Chevalier gagne Coup Fatal Héroïque contre les grandes cibles et monstres.",
-                "Vertu du Chevalier Impétueux (+35 pts)": "Ajoute +D6\" à la distance de charge du régiment au premier tour.",
-                "Vertu de l'Idéal (+50 pts)": "+1 CC, +1 I, +1 A. L'unité perd le bénéfice du commandement du général.",
-                "Vertu d'Audace (+30 pts)": "Permet de relancer tous les jets pour blesser ratés contre les cibles de F5 ou plus.",
-                "Vertu de Discipline (+15 pts)": "Le général et son unité ne peuvent pas être forcés de poursuivre un ennemi.",
-                "--- ARMES MAGIQUES ---": "Pour enrichir l'arsenal de vos Nobles.",
-                "Épée Courtoise (+40 pts)": "Permet de relancer les jets pour toucher manqués contre les adversaires en défi.",
-                "Épée du Graal (+60 pts)": "Attaques magiques qui blessent automatiquement sur 2+ (sauf contre les démons).",
-                "Lance d'Artois (+25 pts)": "Confère la règle Coup Fatal lors du tour où le porteur charge.",
-                "Fléau de Fracasse (+25 pts)": "Détruit l'arme magique adverse sur un jet réussi pour blesser.",
-                "--- ARMURES MAGIQUES ---": "Protections bénies par la Dame.",
-                "Armure Brillante d'Agilgar (+45 pts)": "Sauvegarde d'armure de 3+ non modifiable. Ne peut pas être portée avec un bouclier.",
-                "Armure de la Quête (+30 pts)": "Sauvegarde de 4+. Permet de relancer les sauvegardes d'armure ratées.",
-                "Bouclier du Graal (+35 pts)": "Améliore la Bénédiction de la Dame à 5+ (4+ contre la Force 5+).",
-                "--- BANNIÈRES MAGIQUES ---": "Drapeaux porteurs de ferveur.",
-                "Bannière de la Dame du Lac (+100 pts)": "L'ennemi au contact perd tous ses bonus de rangs au résultat de combat.",
-                "Bannière de Courage (+25 pts)": "Permet de relancer les tests de psychologie et de panique ratés.",
-                "Bannière de Châlons (+10 pts)": "Les ennemis ne peuvent pas déclarer de réaction 'Maintenir leur position et Tirer'.",
-                "--- OBJETS ENCHANTÉS & CABALISTIQUES ---": "Reliques de puissance.",
-                "Sceau de la Dame (+30 pts)": "Confère Résistance à la Magie (2) à toute l'unité qui accompagne le porteur.",
-                "Miroir de Glace (+30 pts)": "Objet de sort (niveau 3) lançant un projectile magique de glace.",
-                "Tresse d'Iseult (+20 pts)": "Usage unique. Touche automatiquement sur 2+ durant un round de combat.",
-                "Icône de Quenelles (+25 pts)": "L'unité ajoute +1 à son résultat de combat s'il y a un paysan dedans."
+                "--- VERTUS BRETONNIENNES ---": "Réservées aux personnages combattants.",
+                "Vertu d'Héroïsme (+40 pts)": "Confère Coup Fatal Héroïque contre les grandes cibles.",
+                "Vertu du Chevalier Impétueux (+35 pts)": "Ajoute +D6\" de portée à la première charge.",
+                "Vertu de l'Idéal (+50 pts)": "+1 CC, +1 I, +1 A. Le porteur ne peut être le Général.",
+                "Vertu d'Audace (+30 pts)": "Relance les jets pour blesser ratés contre l'endurance élevée (F5+).",
+                "--- ARMES MAGIQUES ---": "Arsenal béni.",
+                "Épée Courtoise (+40 pts)": "Relance les touches manquées lors des Défis.",
+                "Épée du Graal (+60 pts)": "Attaques magiques blessant automatiquement sur 2+.",
+                "Lance d'Artois (+25 pts)": "Donne Coup Fatal lors du tour où le porteur charge.",
+                "--- ARMURES MAGIQUES ---": "Protections sacrées.",
+                "Armure Brillante d'Agilgar (+45 pts)": "Sauvegarde d'armure de 3+ fixe non modifiable.",
+                "Armure de la Quête (+30 pts)": "Permet de relancer les sauvegardes d'armure ratées.",
+                "Bouclier du Graal (+35 pts)": "Améliore la Bénédiction de la Dame de l'unité.",
+                "--- BANNIÈRES MAGIQUES ---": "Étendards sacrés.",
+                "Bannière de la Dame (+100 pts)": "L'ennemi au contact perd ses bonus de rangs.",
+                "Bannière de Châlons (+10 pts)": "Interdit les réactions de type 'Maintenir et Tirer'."
             }
         };
 
@@ -188,13 +170,13 @@
             filtered.forEach(unit => {
                 const costText = unit.perFigPts ? `${unit.perFigPts} pts/fig` : `${unit.basePts} pts`;
                 const div = document.createElement('div');
-                div.className = "bg-gray-800 p-3 rounded-lg border border-gray-700 flex justify-between items-center hover:border-blue-500 transition shadow-sm";
+                div.className = "bg-gray-800 p-2.5 rounded-lg border border-gray-700 flex justify-between items-center hover:border-yellow-600 transition shadow-sm text-xs";
                 div.innerHTML = `
                     <div>
-                        <h4 class="font-cinzel text-sm text-yellow-100 font-bold">${unit.name}</h4>
-                        <p class="text-xs text-yellow-500">${costText} <span class="text-[10px] text-gray-400">(${CAT_LABELS[unit.cat].split(' ')[1]})</span></p>
+                        <h4 class="font-cinzel text-yellow-100 font-bold">${unit.name}</h4>
+                        <p class="text-yellow-500 font-semibold">${costText} <span class="text-[10px] text-gray-400 font-normal">(${CAT_LABELS[unit.cat].split(' ')[1]})</span></p>
                     </div>
-                    <button onclick="addUnitToArmy('${unit.id}')" class="bg-blue-700 hover:bg-blue-600 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center shadow text-lg transition">
+                    <button onclick="addUnitToArmy('${unit.id}')" class="bg-blue-700 hover:bg-blue-600 text-white font-bold w-7 h-7 rounded-full flex items-center justify-center text-md transition shadow">
                         +
                     </button>
                 `;
@@ -207,12 +189,12 @@
             if (!template) return;
             
             if (template.unique && myArmy.some(u => u.id === unitId)) {
-                alert(`👑 ${template.name} est un personnage unique et ne peut être aligné qu'une seule fois !`);
+                alert(`👑 ${template.name} est unique et fait déjà partie de votre Hoste.`);
                 return;
             }
 
-            const newInstance = {
-                instanceId: 'inst_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+            myArmy.push({
+                instanceId: 'inst_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
                 id: template.id,
                 cat: template.cat,
                 name: template.name,
@@ -222,9 +204,7 @@
                 rules: [...template.rules],
                 availableOptions: template.options ? JSON.parse(JSON.stringify(template.options)) : [],
                 selectedOptions: []
-            };
-
-            myArmy.push(newInstance);
+            });
             renderArmy();
         }
 
@@ -236,7 +216,7 @@
         function updateQty(instanceId, val) {
             const unit = myArmy.find(u => u.instanceId === instanceId);
             if (unit) {
-                unit.qty = parseInt(val) || 1;
+                unit.qty = Math.max(1, parseInt(val) || 1);
                 recalculateTotal();
             }
         }
@@ -244,17 +224,14 @@
         function toggleOption(instanceId, optionName, isChecked) {
             const unit = myArmy.find(u => u.instanceId === instanceId);
             if (unit) {
-                if (isChecked) {
-                    unit.selectedOptions.push(optionName);
-                } else {
-                    unit.selectedOptions = unit.selectedOptions.filter(o => o !== optionName);
-                }
+                if (isChecked) unit.selectedOptions.push(optionName);
+                else unit.selectedOptions = unit.selectedOptions.filter(o => o !== optionName);
                 recalculateTotal();
             }
         }
 
         function clearArmy() {
-            if(confirm("Voulez-vous disperser l'Hoste et vider votre liste d'armée ?")) {
+            if(confirm("Disperser l'Hoste royal ?")) {
                 myArmy = [];
                 renderArmy();
             }
@@ -266,10 +243,9 @@
 
             myArmy.forEach(unit => {
                 let unitTotal = unit.perFigPts ? (unit.qty * unit.perFigPts) : unit.basePts;
-
                 unit.selectedOptions.forEach(optName => {
-                    const optionData = unit.availableOptions.find(o => o.name === optName);
-                    if (optionData) unitTotal += optionData.pts;
+                    const opt = unit.availableOptions.find(o => o.name === optName);
+                    if (opt) unitTotal += opt.pts;
                 });
 
                 catTotals[unit.cat] += unitTotal;
@@ -281,22 +257,33 @@
 
             document.getElementById('global-total').innerText = globalTotal;
 
-            // Mise à jour permanente des contrôles de pourcentages
+            // MISE À JOUR PERMANENTE DU DASHBOARD ET DES BARRES VISUELLES
             for (const cat in catTotals) {
                 const pct = globalTotal > 0 ? Math.round((catTotals[cat] / globalTotal) * 100) : 0;
-                const element = document.getElementById(`pct-${cat}`);
-                if (element) {
-                    element.innerText = `${pct}%`;
-                    
-                    // Alertes visuelles légères selon les règles classiques (Exemple Old World)
-                    if (cat === 'core' && pct < 25 && globalTotal > 0) {
-                        element.className = "font-bold text-red-500 animate-pulse";
-                    } else if (cat === 'core' && pct >= 25) {
-                        element.className = "font-bold text-green-400";
-                    } else if ((cat === 'rare' || cat === 'heroes' || cat === 'hero_spec') && pct > 25) {
-                        element.className = "font-bold text-orange-500 font-bold";
+                
+                const txtElement = document.getElementById(`pct-${cat}`);
+                const barElement = document.getElementById(`bar-${cat}`);
+                
+                if (txtElement && barElement) {
+                    txtElement.innerText = `${pct}%`;
+                    barElement.style.width = `${Math.min(100, pct)}%`;
+
+                    // Gestion dynamique des couleurs réglementaires
+                    if (cat === 'core') {
+                        if (pct < 25 && globalTotal > 0) {
+                            txtElement.className = "block text-sm font-bold text-red-500 animate-pulse";
+                            barElement.className = "bg-red-600 h-full w-0 transition-all";
+                        } else {
+                            txtElement.className = "block text-sm font-bold text-green-400";
+                            barElement.className = "bg-green-500 h-full w-0 transition-all";
+                        }
                     } else {
-                        element.className = "font-bold text-gray-200";
+                        if (pct > 25) {
+                            txtElement.className = "block text-sm font-bold text-orange-400";
+                            barElement.className = "bg-orange-500 h-full w-0 transition-all";
+                        } else {
+                            txtElement.className = "block text-sm font-bold text-gray-200";
+                        }
                     }
                 }
             }
@@ -304,85 +291,66 @@
 
         function renderArmy() {
             const listContainer = document.getElementById('army-list');
-            if (!listContainer) return;
-
             if (myArmy.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="text-center text-gray-500 py-12 italic">
-                        Aucune unité déployée. Cliquez sur le bouton "+" du catalogue pour lever votre armée.
-                    </div>
-                `;
+                listContainer.innerHTML = `<div class="text-center text-gray-500 py-8 italic text-xs">Aucun bataillon actif. Intégrez des troupes depuis le catalogue.</div>`;
                 recalculateTotal();
                 return;
             }
 
             let htmlStr = '';
 
-            // Tri et affichage structurel par type d'unité
             for (const [catKey, catLabel] of Object.entries(CAT_LABELS)) {
                 const unitsInCat = myArmy.filter(u => u.cat === catKey);
-                
                 if (unitsInCat.length > 0) {
                     htmlStr += `
-                        <div class="space-y-3 print-section">
-                            <h3 class="text-xs font-medieval tracking-wider uppercase text-yellow-500 border-b border-gray-800 pb-1 mb-2">${catLabel}</h3>
+                        <div class="space-y-2">
+                            <h3 class="text-[11px] font-medieval tracking-wider uppercase text-yellow-500 border-b border-gray-800 pb-1">${catLabel}</h3>
                     `;
 
                     unitsInCat.forEach(unit => {
                         let optionsHTML = '';
-                        if (unit.availableOptions && unit.availableOptions.length > 0) {
-                            optionsHTML = `<div class="mt-3 pt-2 border-t border-gray-800 space-y-1.5 no-print">`;
+                        if (unit.availableOptions.length > 0) {
+                            optionsHTML = `<div class="mt-2 pt-2 border-t border-gray-800 space-y-1">`;
                             unit.availableOptions.forEach(opt => {
                                 const isChecked = unit.selectedOptions.includes(opt.name) ? 'checked' : '';
                                 optionsHTML += `
-                                    <label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer">
+                                    <label class="flex items-center gap-2 text-[11px] text-gray-400 cursor-pointer">
                                         <input type="checkbox" onchange="toggleOption('${unit.instanceId}', '${opt.name}', this.checked)" ${isChecked} class="accent-yellow-600 rounded">
                                         <span>${opt.name} (+${opt.pts} pts)</span>
                                     </label>
                                 `;
                             });
                             optionsHTML += `</div>`;
-                            
-                            // Version texte visible uniquement à l'impression pour les options retenues
-                            if(unit.selectedOptions.length > 0) {
-                                optionsHTML += `<div class="hidden print:block text-[11px] text-gray-700 italic mt-1">Options : ${unit.selectedOptions.join(', ')}</div>`;
-                            }
                         }
 
                         let qtyHTML = '';
                         if (unit.perFigPts) {
                             qtyHTML = `
-                                <div class="flex items-center gap-2 mt-2 sm:mt-0 no-print">
-                                    <span class="text-xs text-gray-400">Effectif:</span>
-                                    <input type="number" min="1" value="${unit.qty}" oninput="updateQty('${unit.instanceId}', this.value)" class="w-14 bg-gray-800 text-white text-center font-bold text-xs rounded p-1 border border-gray-700">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] text-gray-500">Effectif:</span>
+                                    <input type="number" min="1" value="${unit.qty}" oninput="updateQty('${unit.instanceId}', this.value)" class="w-10 bg-gray-800 text-white text-center font-bold text-xs rounded border border-gray-700 p-0.5">
                                 </div>
-                                <span class="hidden print:inline text-[11px] text-black font-medium">Effectif: ${unit.qty}x</span>
                             `;
                         }
 
                         htmlStr += `
-                            <div class="bg-slate-900 border border-gray-800 rounded-xl p-4 shadow relative hover:border-yellow-700 transition print-card">
-                                <div class="flex justify-between items-start flex-wrap gap-2">
+                            <div class="bg-slate-900 border border-gray-800 rounded-lg p-3 relative hover:border-yellow-800 transition text-xs">
+                                <div class="flex justify-between items-start gap-2">
                                     <div>
-                                        <h4 class="font-cinzel font-bold text-sm text-yellow-400 print-text-dark">${unit.name}</h4>
-                                        <p class="text-[10px] text-gray-400 italic max-w-sm mt-0.5 print-text-dark">Règles : ${unit.rules.join(', ')}</p>
+                                        <h4 class="font-cinzel font-bold text-yellow-400">${unit.name}</h4>
+                                        <p class="text-[10px] text-gray-500 italic mt-0.5">Règles : ${unit.rules.join(', ')}</p>
                                     </div>
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2">
                                         ${qtyHTML}
-                                        <span id="pts-badge-${unit.instanceId}" class="bg-gray-800 text-yellow-500 font-bold text-xs px-2 py-1 rounded border border-gray-700 print-text-dark print:border-none print:bg-transparent">
-                                            0 pts
-                                        </span>
-                                        <button onclick="removeUnitInstance('${unit.instanceId}')" class="text-gray-500 hover:text-red-500 text-sm font-bold pl-1 no-print">
-                                            🗑️
-                                        </button>
+                                        <span id="pts-badge-${unit.instanceId}" class="bg-gray-800 text-yellow-500 font-bold px-1.5 py-0.5 rounded border border-gray-700 text-[11px]">0 pts</span>
+                                        <button onclick="removeUnitInstance('${unit.instanceId}')" class="text-gray-600 hover:text-red-500 font-bold px-1">✕</button>
                                     </div>
                                 </div>
                                 ${optionsHTML}
                             </div>
                         `;
                     });
-
-                    htmlStr += `</div>`; // Fin de section de catégorie
+                    htmlStr += `</div>`;
                 }
             }
 
@@ -393,13 +361,12 @@
         function switchGrimoire(tab) {
             const btnRules = document.getElementById('tab-rules');
             const btnItems = document.getElementById('tab-items');
-
             if(tab === 'rules') {
-                btnRules.className = "flex-1 py-1 px-2 font-bold bg-yellow-600 text-gray-950 rounded";
-                btnItems.className = "flex-1 py-1 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700";
+                btnRules.className = "flex-1 py-1.5 px-2 font-bold bg-yellow-600 text-gray-950 rounded";
+                btnItems.className = "flex-1 py-1.5 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700";
             } else {
-                btnItems.className = "flex-1 py-1 px-2 font-bold bg-yellow-600 text-gray-950 rounded";
-                btnRules.className = "flex-1 py-1 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700";
+                btnItems.className = "flex-1 py-1.5 px-2 font-bold bg-yellow-600 text-gray-950 rounded";
+                btnRules.className = "flex-1 py-1.5 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700";
             }
             renderGrimoire(tab);
         }
@@ -407,19 +374,14 @@
         function renderGrimoire(type) {
             const container = document.getElementById('grimoire-content');
             container.innerHTML = '';
-
-            const data = CODEX[type];
-            for (const [key, val] of Object.entries(data)) {
+            for (const [key, val] of Object.entries(CODEX[type])) {
                 const itemDiv = document.createElement('div');
                 if (key.startsWith("---")) {
-                    itemDiv.className = "pt-2 border-b border-gray-800";
-                    itemDiv.innerHTML = `<h5 class="text-yellow-600 font-bold text-center tracking-widest text-[10px] uppercase">${key.replace(/---/g, '')}</h5>`;
+                    itemDiv.className = "pt-2 text-center border-b border-gray-800";
+                    itemDiv.innerHTML = `<h5 class="text-yellow-600 font-bold text-[10px] tracking-wider uppercase">${key.replace(/---/g, '')}</h5>`;
                 } else {
-                    itemDiv.className = "bg-gray-850 p-2 rounded border border-gray-800";
-                    itemDiv.innerHTML = `
-                        <h5 class="text-yellow-500 font-bold font-medieval tracking-wide">${key}</h5>
-                        <p class="text-gray-400 mt-1 leading-relaxed text-[11px]">${val}</p>
-                    `;
+                    itemDiv.className = "bg-gray-950 p-2 rounded border border-gray-850";
+                    itemDiv.innerHTML = `<h5 class="text-yellow-500 font-bold">${key}</h5><p class="text-gray-400 mt-0.5 text-[11px] leading-relaxed">${val}</p>`;
                 }
                 container.appendChild(itemDiv);
             }
@@ -427,11 +389,10 @@
 
         function exportToPDF() {
             if(myArmy.length === 0) {
-                alert("Votre armée est vide. Ajoutez des troupes avant d'exporter.");
+                alert("Votre armée ne compte aucun guerrier à inscrire sur les parchemins d'export.");
                 return;
             }
             
-            // Ouverture d'une fenêtre épurée spécialement configurée pour l'impression système en PDF
             const total = document.getElementById('global-total').innerText;
             const printWindow = window.open('', '_blank');
             
@@ -441,21 +402,21 @@
             <head>
                 <title>Hoste de Bataille Bretonnien - ${total} pts</title>
                 <style>
-                    body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; color: #111; padding: 30px; line-height: 1.4; }
-                    h1 { font-family: Georgia, serif; text-align: center; border-bottom: 3px double #333; padding-bottom: 10px; margin-bottom: 5px; }
-                    .subtitle { text-align: center; font-style: italic; color: #555; font-size: 13px; margin-bottom: 30px; }
-                    .total-box { text-align: right; font-size: 18px; font-weight: bold; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-                    .category-title { font-family: Georgia, serif; font-size: 15px; text-transform: uppercase; border-bottom: 2px solid #555; margin-top: 25px; padding-bottom: 3px; font-weight: bold; color: #222; }
-                    .unit-card { margin: 12px 0; padding: 10px; border: 1px solid #ccc; background: #fafafa; page-break-inside: avoid; }
-                    .unit-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; }
-                    .unit-rules { font-size: 11px; color: #555; margin: 3px 0; italic; }
-                    .unit-options { font-size: 11px; color: #000; font-weight: 500; margin-top: 5px; padding-top: 4px; border-top: 1px dashed #ddd; }
+                    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #111; padding: 40px; line-height: 1.5; background: #fff; }
+                    h1 { font-family: Georgia, serif; text-align: center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 2px; }
+                    .subtitle { text-align: center; font-style: italic; color: #666; font-size: 12px; margin-bottom: 25px; }
+                    .total-box { text-align: right; font-size: 16px; font-weight: bold; margin-bottom: 20px; border-bottom: 1px solid #000; padding-bottom: 8px; }
+                    .category-title { font-family: Georgia, serif; font-size: 14px; text-transform: uppercase; border-bottom: 2px solid #333; margin-top: 25px; padding-bottom: 4px; font-weight: bold; }
+                    .unit-card { margin: 10px 0; padding: 10px; border: 1px solid #aaa; background: #fdfdfd; page-break-inside: avoid; }
+                    .unit-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; }
+                    .unit-rules { font-size: 11px; color: #555; margin-top: 4px; font-style: italic; }
+                    .unit-options { font-size: 11px; color: #111; font-weight: bold; margin-top: 6px; padding-top: 4px; border-top: 1px dashed #ccc; }
                 </style>
             </head>
             <body>
-                <h1>⚔️ Hoste de Bataille Bretonnien ⚔️</h1>
+                <h1>⚔️ HOSTE DE BATAILLE BRETONNIEN ⚔️</h1>
                 <div class="subtitle">"Honneur, Devoir, et Fidélité à la Dame du Lac"</div>
-                <div class="total-box">Valeur Totale de l'Armée : ${total} points</div>
+                <div class="total-box">Valeur de l'Armée : ${total} points réglementaires</div>
             `;
 
             for (const [catKey, catLabel] of Object.entries(CAT_LABELS)) {
@@ -470,15 +431,15 @@
                         });
 
                         const qtyStr = u.perFigPts ? `(Effectif : ${u.qty}x)` : '';
-                        const optsStr = u.selectedOptions.length > 0 ? `<div class="unit-options">Équipements & Améliorations : ${u.selectedOptions.join(', ')}</div>` : '';
+                        const optsStr = u.selectedOptions.length > 0 ? `<div class="unit-options">Options & Équipement : ${u.selectedOptions.join(', ')}</div>` : '';
 
                         printHTML += `
                             <div class="unit-card">
                                 <div class="unit-header">
-                                    <span>${u.name} ${qtyStr}</span>
+                                    <span>• ${u.name} ${qtyStr}</span>
                                     <span>${uTotal} pts</span>
                                 </div>
-                                <div class="unit-rules">Règles de combat : ${u.rules.join(', ')}</div>
+                                <div class="unit-rules">Aptitudes : ${u.rules.join(', ')}</div>
                                 ${optsStr}
                             </div>
                         `;
@@ -490,7 +451,7 @@
                 <script>
                     window.onload = function() {
                         window.print();
-                        setTimeout(function() { window.close(); }, 500);
+                        setTimeout(function() { window.close(); }, 300);
                     };
                 <\/script>
             </body>
@@ -501,7 +462,6 @@
         }
 
         document.getElementById('catalog-filter').addEventListener('change', renderCatalog);
-
         window.onload = init;
     </script>
 </body>
