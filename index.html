@@ -278,3 +278,70 @@
                 if (unit.perFigPts) {
                     qtyHTML = `
                         <div class="flex items-center gap-2 mt-2 sm:mt-0">
+                            <span class="text-xs text-gray-400">Effectif:</span>
+                            <input type="number" min="1" value="${unit.qty}" oninput="updateQty('${unit.instanceId}', this.value)" class="w-14 bg-gray-800 text-white text-center font-bold text-xs rounded p-1 border border-gray-700">
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start flex-wrap gap-2">
+                        <div>
+                            <h3 class="font-cinzel font-bold text-sm text-yellow-400">${unit.name}</h3>
+                            <p class="text-[10px] text-gray-400 italic max-w-sm mt-0.5">Règles : ${unit.rules.join(', ')}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            ${qtyHTML}
+                            <span id="pts-badge-${unit.instanceId}" class="bg-gray-800 text-yellow-500 font-bold text-xs px-2 py-1 rounded border border-gray-700">
+                                0 pts
+                            </span>
+                            <button onclick="removeUnitInstance('${unit.instanceId}')" class="text-gray-500 hover:text-red-500 text-sm font-bold pl-1">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    ${optionsHTML}
+                `;
+
+                listContainer.appendChild(card);
+            });
+
+            recalculateTotal();
+        }
+
+        function switchGrimoire(tab) {
+            const btnRules = document.getElementById('tab-rules');
+            const btnItems = document.getElementById('tab-items');
+
+            if(tab === 'rules') {
+                btnRules.className = "flex-1 py-1 px-2 font-bold bg-yellow-600 text-gray-950 rounded";
+                btnItems.className = "flex-1 py-1 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700";
+            } else {
+                btnItems.className = "flex-1 py-1 px-2 font-bold bg-yellow-600 text-gray-950 rounded";
+                btnRules.className = "flex-1 py-1 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700";
+            }
+            renderGrimoire(tab);
+        }
+
+        function renderGrimoire(type) {
+            const container = document.getElementById('grimoire-content');
+            container.innerHTML = '';
+
+            const data = CODEX[type];
+            for (const [key, val] of Object.entries(data)) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-gray-850 p-2 rounded border border-gray-800";
+                itemDiv.innerHTML = `
+                    <h5 class="text-yellow-500 font-bold font-medieval tracking-wide">${key}</h5>
+                    <p class="text-gray-400 mt-1 leading-relaxed text-[11px]">${val}</p>
+                `;
+                container.appendChild(itemDiv);
+            }
+        }
+
+        document.getElementById('catalog-filter').addEventListener('change', renderCatalog);
+
+        window.onload = init;
+    </script>
+</body>
+</html>
