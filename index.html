@@ -46,10 +46,10 @@
             </div>
 
             <div class="grid grid-cols-3 gap-2 mb-4">
-                <button onclick="exportToPDF()" class="col-span-2 bg-blue-700 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded transition flex items-center justify-center gap-2 shadow-md">
+                <button id="btn-pdf" class="col-span-2 bg-blue-700 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded transition flex items-center justify-center gap-2 shadow-md">
                     📄 EXPORTER L'HOSTE EN PDF
                 </button>
-                <button onclick="clearArmy()" class="bg-red-950 hover:bg-red-900 text-red-200 text-xs border border-red-700 rounded transition">
+                <button id="btn-clear" class="bg-red-950 hover:bg-red-900 text-red-200 text-xs border border-red-700 rounded transition">
                     Vider la liste
                 </button>
             </div>
@@ -83,8 +83,8 @@
             <h2 class="text-xl font-medieval text-yellow-400 border-b border-gray-700 pb-2 mb-3">📚 Grimoire & Arsenal</h2>
             
             <div class="flex gap-2 mb-3 text-xs">
-                <button onclick="switchGrimoire('rules')" id="tab-rules" class="flex-1 py-1.5 px-2 font-bold bg-yellow-600 text-gray-950 rounded">Règles</button>
-                <button onclick="switchGrimoire('items')" id="tab-items" class="flex-1 py-1.5 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700">Objets & Vertus</button>
+                <button id="tab-rules" class="flex-1 py-1.5 px-2 font-bold bg-yellow-600 text-gray-950 rounded">Règles</button>
+                <button id="tab-items" class="flex-1 py-1.5 px-2 font-bold bg-gray-800 text-gray-400 rounded hover:bg-gray-700">Objets & Vertus</button>
             </div>
 
             <div id="grimoire-content" class="flex-1 overflow-y-auto space-y-3 text-xs text-gray-300 pr-1">
@@ -99,6 +99,14 @@
             core: "🏹 Unités de Base",
             special: "🐎 Unités Spéciales",
             rare: "🪨 Unités Rares"
+        };
+
+        const BAR_COLORS = {
+            hero_spec: "bg-blue-500",
+            heroes: "bg-purple-500",
+            core: "bg-green-500",
+            special: "bg-yellow-500",
+            rare: "bg-red-400"
         };
 
         const CODEX = {
@@ -154,6 +162,18 @@
 
         let myArmy = [];
 
+        // Sécurisation globale de l'exécution au chargement du DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            
+            // Assignation sécurisée des écouteurs d'événements
+            document.getElementById('catalog-filter').addEventListener('change', renderCatalog);
+            document.getElementById('btn-pdf').addEventListener('click', exportToPDF);
+            document.getElementById('btn-clear').addEventListener('click', clearArmy);
+            document.getElementById('tab-rules').addEventListener('click', () => switchGrimoire('rules'));
+            document.getElementById('tab-items').addEventListener('click', () => switchGrimoire('items'));
+        });
+
         function init() {
             renderCatalog();
             renderGrimoire('rules');
@@ -184,7 +204,7 @@
             });
         }
 
-        function addUnitToArmy(unitId) {
+        window.addUnitToArmy = function(unitId) {
             const template = CODEX.units.find(u => u.id === unitId);
             if (!template) return;
             
@@ -194,7 +214,7 @@
             }
 
             myArmy.push({
-                instanceId: 'inst_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                instanceId: 'inst_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
                 id: template.id,
                 cat: template.cat,
                 name: template.name,
@@ -206,32 +226,32 @@
                 selectedOptions: []
             });
             renderArmy();
-        }
+        };
 
-        function removeUnitInstance(instanceId) {
+        window.removeUnitInstance = function(instanceId) {
             myArmy = myArmy.filter(u => u.instanceId !== instanceId);
             renderArmy();
-        }
+        };
 
-        function updateQty(instanceId, val) {
+        window.updateQty = function(instanceId, val) {
             const unit = myArmy.find(u => u.instanceId === instanceId);
             if (unit) {
                 unit.qty = Math.max(1, parseInt(val) || 1);
                 recalculateTotal();
             }
-        }
+        };
 
-        function toggleOption(instanceId, optionName, isChecked) {
+        window.toggleOption = function(instanceId, optionName, isChecked) {
             const unit = myArmy.find(u => u.instanceId === instanceId);
             if (unit) {
                 if (isChecked) unit.selectedOptions.push(optionName);
                 else unit.selectedOptions = unit.selectedOptions.filter(o => o !== optionName);
                 recalculateTotal();
             }
-        }
+        };
 
         function clearArmy() {
-            if(confirm("Disperser l'Hoste royal ?")) {
+            if(confirm("Disperser l'Hoste royal et vider la liste ?")) {
                 myArmy = [];
                 renderArmy();
             }
@@ -257,7 +277,7 @@
 
             document.getElementById('global-total').innerText = globalTotal;
 
-            // MISE À JOUR PERMANENTE DU DASHBOARD ET DES BARRES VISUELLES
+            // Système de contrôle permanent interactif des pourcentages
             for (const cat in catTotals) {
                 const pct = globalTotal > 0 ? Math.round((catTotals[cat] / globalTotal) * 100) : 0;
                 
@@ -268,19 +288,20 @@
                     txtElement.innerText = `${pct}%`;
                     barElement.style.width = `${Math.min(100, pct)}%`;
 
-                    // Gestion dynamique des couleurs réglementaires
+                    // Reset de la couleur par défaut
+                    barElement.className = `${BAR_COLORS[cat]} h-full w-0 transition-all duration-300`;
+
                     if (cat === 'core') {
                         if (pct < 25 && globalTotal > 0) {
                             txtElement.className = "block text-sm font-bold text-red-500 animate-pulse";
-                            barElement.className = "bg-red-600 h-full w-0 transition-all";
+                            barElement.className = "bg-red-600 h-full w-0 transition-all duration-300";
                         } else {
                             txtElement.className = "block text-sm font-bold text-green-400";
-                            barElement.className = "bg-green-500 h-full w-0 transition-all";
                         }
                     } else {
                         if (pct > 25) {
                             txtElement.className = "block text-sm font-bold text-orange-400";
-                            barElement.className = "bg-orange-500 h-full w-0 transition-all";
+                            barElement.className = "bg-orange-500 h-full w-0 transition-all duration-300";
                         } else {
                             txtElement.className = "block text-sm font-bold text-gray-200";
                         }
@@ -460,9 +481,6 @@
             printWindow.document.write(printHTML);
             printWindow.document.close();
         }
-
-        document.getElementById('catalog-filter').addEventListener('change', renderCatalog);
-        window.onload = init;
     </script>
 </body>
 </html>
